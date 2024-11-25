@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee List</title>
+  <link rel="stylesheet" href="employee_list.css">
+</head>
+<body>
+  <div class="list-container">
+    <h1>Employee List</h1>
+
+    <!-- Search Bar -->
+    <input type="text" id="searchInput" placeholder="Search for employees" onkeyup="searchEmployees()" class="search-bar">
+
+    <!-- Add Employee Button -->
+    <button id="addEmployeeBtn" onclick="addEmployee()">Add Employee</button>
+
+    <!-- Employee Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Designation</th>
+          <th>Gender</th>
+          <th>Course</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="employeeTable">
+        <!-- Employee rows will be added here dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Fetch employees from localStorage or initialize as an empty array
+    let employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+    // Function to render employee table
+    function renderEmployeeTable() {
+      const table = document.getElementById("employeeTable");
+      table.innerHTML = ''; // Clear existing table content
+
+      // Render all employees in the table
+      employees.forEach((employee, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${employee.name}</td>
+          <td>${employee.email}</td>
+          <td>${employee.mobile}</td>
+          <td>${employee.designation}</td>
+          <td>${employee.gender}</td>
+          <td>${employee.course}</td>
+          <td>
+            <button onclick="editEmployee(${index})">Edit</button>
+            <button onclick="deleteEmployee(${index})">Delete</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    // Add employee functionality
+    function addEmployee() {
+      // Redirect to form to add employee
+      window.location.href = "form.html";
+    }
+
+    // Edit employee functionality
+    function editEmployee(index) {
+      const employee = employees[index];
+      // Redirect to form to edit employee (passing employee data)
+      localStorage.setItem("editEmployeeIndex", index);
+      localStorage.setItem("editEmployeeData", JSON.stringify(employee));
+      window.location.href = "form.html";
+    }
+
+    // Delete employee functionality
+    function deleteEmployee(index) {
+      if (confirm("Are you sure you want to delete this employee?")) {
+        employees.splice(index, 1); // Remove employee from the array
+        localStorage.setItem("employees", JSON.stringify(employees)); // Update localStorage
+        renderEmployeeTable(); // Re-render table after deletion
+      }
+    }
+
+    // Search employee functionality
+    function searchEmployees() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filteredEmployees = employees.filter(employee => {
+        return employee.name.toLowerCase().includes(query) ||
+               employee.email.toLowerCase().includes(query) ||
+               employee.mobile.toLowerCase().includes(query);
+      });
+
+      // Update table with filtered employees
+      const table = document.getElementById("employeeTable");
+      table.innerHTML = '';
+
+      filteredEmployees.forEach((employee, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${employee.name}</td>
+          <td>${employee.email}</td>
+          <td>${employee.mobile}</td>
+          <td>${employee.designation}</td>
+          <td>${employee.gender}</td>
+          <td>${employee.course}</td>
+          <td>
+            <button onclick="editEmployee(${index})">Edit</button>
+            <button onclick="deleteEmployee(${index})">Delete</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    // Initial render of employee table
+    renderEmployeeTable();
+  </script>
+</body>
+</html>
